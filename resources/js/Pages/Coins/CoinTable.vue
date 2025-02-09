@@ -4,6 +4,8 @@ import DownTrendIcon from "@/Components/Icons/DownTrendIcon.vue";
 import UpTrendIcon from "@/Components/Icons/UpTrendIcon.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import TextInput from "@/Components/TextInput.vue";
+import SortUpIcon from "@/Components/Icons/SortUpIcon.vue";
+import SortDownIcon from "@/Components/Icons/SortDownIcon.vue";
 
 const props = defineProps({
     coins: Array,
@@ -14,6 +16,31 @@ const filters = reactive({
     quoted_symbol: '',
     price_change_direction: '',
 })
+
+const sort = reactive({
+    key: '',
+    direction: 'asc',
+})
+const sortKeyOptions = [
+    {
+        id: 'price',
+        name: 'Fiyat'
+    },
+    {
+        id: 'price_change_percent',
+        name: 'Değişim'
+    },
+]
+const sortDirectionOptions = [
+    {
+        id: 'asc',
+        name: 'Artan'
+    },
+    {
+        id: 'desc',
+        name: 'Azalan'
+    },
+]
 const quotedSymbolOptions = computed(() => {
     let quotedSymbols = [];
     props.coins.forEach(coin => {
@@ -90,8 +117,26 @@ const generatedCoinList = computed(() => {
     return coins;
 })
 
+const sortedCoins = computed(() => {
+    let coins = [...generatedCoinList.value];
+
+    if (sort.key) {
+        coins = coins.sort((a, b) => {
+            let aValue = a.price?.[filters.quoted_symbol]?.[sort.key];
+            let bValue = b.price?.[filters.quoted_symbol]?.[sort.key];
+
+            if (sort.direction === 'asc') {
+                return aValue - bValue;
+            } else {
+                return bValue - aValue;
+            }
+        })
+    }
+
+    return coins;
+})
 const filteredCoins = computed(() => {
-    let coins = generatedCoinList.value;
+    let coins = sortedCoins.value;
 
     /*Filter*/
     if (filters.base_symbol) {
@@ -131,7 +176,17 @@ const cleanedPrice = (price) => {
         </div>
 
         <!--Quoted Symbol:select-->
-        <SelectInput :options="quotedSymbolOptions" label="Fiyat Birimi" placeholder="Fiyat Birimi" v-model="filters.quoted_symbol"/>
+        <div class="flex items-center space-x-2">
+            <!--Sort Direction Icon-->
+            <button v-if="filters.quoted_symbol && sort.key" class="border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm p-3 bg-white" @click="sort.direction === 'desc' ? sort.direction = 'asc' : sort.direction = 'desc'">
+                <SortUpIcon class="w-4 h-4" v-if="sort.direction === 'asc'"/>
+                <SortDownIcon class="w-4 h-4" v-if="sort.direction === 'desc'"/>
+            </button>
+            <!--Sort Key:select-->
+            <SelectInput v-if="filters.quoted_symbol" :options="sortKeyOptions" label="Sıralama" placeholder="Sıralama" v-model="sort.key"/>
+            <!--Quoted Symbol:select-->
+            <SelectInput :options="quotedSymbolOptions" label="Fiyat Birimi" placeholder="Fiyat Birimi" v-model="filters.quoted_symbol"/>
+        </div>
     </div>
     <!--Grid view of the coins list-->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
