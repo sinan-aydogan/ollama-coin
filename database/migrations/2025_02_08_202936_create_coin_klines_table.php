@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('low');
             $table->json('close');
             $table->json('volume');
-            $table->timestamp('kline_at')->nullable();
+            $table->json('time');
             $table->timestamps();
         });
     }

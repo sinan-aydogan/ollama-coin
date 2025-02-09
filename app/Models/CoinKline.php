@@ -16,11 +16,17 @@ class CoinKline extends Model
         'volume',
         'diff',
         'diff_percent',
-        'kline_at',
+        'time',
     ];
 
     protected $casts = [
         'kline_at' => 'datetime',
+        'open' => 'array',
+        'high' => 'array',
+        'low' => 'array',
+        'close' => 'array',
+        'volume' => 'array',
+        'time' => 'array',
     ];
 
     public function coin(): BelongsTo

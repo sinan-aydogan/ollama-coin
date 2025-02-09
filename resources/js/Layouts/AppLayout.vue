@@ -56,7 +56,7 @@ const logout = () => {
                                     Coinler
                                 </NavLink>
 
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <NavLink :href="route('analysis.index')" :active="route().current('analysis.index')">
                                     Analizler
                                 </NavLink>
                             </div>

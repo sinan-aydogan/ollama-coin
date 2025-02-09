@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\CoinController;
 use App\Http\Controllers\SystemSettingController;
 use App\Http\Controllers\WalletController;
@@ -34,6 +35,10 @@ Route::middleware([
     Route::get("/sync-coin-list", [CoinController::class, 'syncCoinList'])->name('coins.sync-coin-list');
     Route::get("/sync-coin-price/{symbol}", [CoinController::class, 'syncCoinPrice'])->name('coins.sync-coin-price');
     Route::get("/sync-coin-prices", [CoinController::class, 'syncCoinPrices'])->name('coins.sync-coin-prices');
+
+    /*Analysis*/
+    Route::get('/analysis', [AnalysisController::class, 'index'])->name('analysis.index');
+    Route::get('/get-kline-data-all-coins', [AnalysisController::class, 'getKlineDataAllCoins'])->name('analysis.get-kline-data-all-coins');
 
     /*Settings*/
     Route::get('/system-settings', [SystemSettingController::class, 'index'])->name('system-settings.index');

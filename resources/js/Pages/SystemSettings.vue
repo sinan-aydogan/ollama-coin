@@ -20,7 +20,9 @@ const props = defineProps({
         default:()=>({
             ai_base_url: '',
             ai_model: '',
-            default_exchange_for_market_data: ''
+            default_exchange_for_market_data: '',
+            default_kline_data_resolution: '',
+            default_kline_data_time_range: '',
         })
     },
     exchangeOptions: Array,
@@ -31,8 +33,106 @@ const form = useForm({
     ai_base_url: '',
     ai_model: '',
     default_exchange_for_market_data: '',
+    default_kline_data_resolution: '',
+    default_kline_data_time_range: '',
 })
 
+const klineDataResolutionOptions = [
+    {
+        id: '1',
+        name: '1 Dakika'
+    },
+    {
+        id: '15',
+        name: '15 Dakika'
+    },
+    {
+        id: '30',
+        name: '30 Dakika'
+    },
+    {
+        id: '60',
+        name: '1 Saat'
+    },
+    {
+        id: '240',
+        name: '4 Saat'
+    },
+    {
+        id: '1440',
+        name: '1 Gün'
+    },
+    {
+        id: '10080',
+        name: '1 Hafta'
+    },
+    {
+        id: '518400',
+        name: '1 Yıl',
+    }
+]
+const klineDataTimeRangeOptions = [
+    {
+        id: '5',
+        name: '5 Dakika'
+    },
+    {
+        id: '15',
+        name: '15 Dakika'
+    },
+    {
+        id: '30',
+        name: '30 Dakika'
+    },
+    {
+        id: '60',
+        name: '1 Saat'
+    },
+    {
+        id: '180',
+        name: '3 Saat'
+    },
+    {
+        id: '360',
+        name: '6 Saat'
+    },
+    {
+        id: '720',
+        name: '12 Saat'
+    },
+    {
+        id: '1440',
+        name: '1 Gün'
+    },
+    {
+        id: '2880',
+        name: '2 Gün'
+    },
+    {
+        id: '4320',
+        name: '3 Gün'
+    },
+    {
+        id: '10080',
+        name: '1 Hafta'
+    },
+    {
+        id: '20160',
+        name: '2 Hafta'
+    },
+    {
+        id: '43200',
+        name: '1 Ay'
+    },
+    {
+        id: '86400',
+        name: '2 Ay'
+    },
+    {
+        id: '129600',
+        name: '3 Ay'
+    }
+]
 const aiModels = ref([])
 const getAiModels = async()=>{
     in_progress.value = true
@@ -56,6 +156,8 @@ onMounted(async()=>{
     form.ai_base_url = props.settings.ai_base_url
     form.ai_model = props.settings.ai_model
     form.default_exchange_for_market_data = props.settings.default_exchange_for_market_data
+    form.default_kline_data_resolution = props.settings.default_kline_data_resolution
+    form.default_kline_data_time_range = props.settings.default_kline_data_time_range
     await getAiModels();
 })
 </script>
@@ -138,6 +240,55 @@ onMounted(async()=>{
                                 label-key="name"
                             />
                             <InputError :message="form.errors.default_exchange_for_market_data" class="mt-2" />
+                        </div>
+                    </template>
+
+                    <template #actions>
+                        <ActionMessage :on="form.recentlySuccessful" class="me-3">
+                            Kaydedildi.
+                        </ActionMessage>
+
+                        <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing || in_progress">
+                            Kaydet
+                        </PrimaryButton>
+                    </template>
+                </FormSection>
+
+                <!--Analysis-->
+                <FormSection @submitted="onSubmit">
+                    <template #title>
+                        Analiz Ayarları
+                    </template>
+
+                    <template #description>
+                        Analiz ayarlarını buradan güncelleyebilirsiniz.
+                    </template>
+
+                    <template #form>
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="default_kline_data_resolution" value="Kline Verilerinin Çözünürlüğü" />
+                            <SelectInput
+                                id="default_kline_data_resolution"
+                                v-model="form.default_kline_data_resolution"
+                                class="mt-1 block w-full"
+                                :options="klineDataResolutionOptions"
+                                value-key="id"
+                                label-key="name"
+                            />
+                            <InputError :message="form.errors.default_kline_data_resolution" class="mt-2" />
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="default_kline_data_time_range" value="Kline Verilerinin Zaman Aralığı" />
+                            <SelectInput
+                                id="default_kline_data_time_range"
+                                v-model="form.default_kline_data_time_range"
+                                class="mt-1 block w-full"
+                                :options="klineDataTimeRangeOptions"
+                                value-key="id"
+                                label-key="name"
+                            />
+                            <InputError :message="form.errors.default_kline_data_time_range" class="mt-2" />
                         </div>
                     </template>
 

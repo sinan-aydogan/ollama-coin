@@ -74,8 +74,27 @@ class Coin extends Model
         return $this->getExchangeRepository()->getCoinTicker($symbol);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getTickersAllCoins(): array
     {
         return $this->getExchangeRepository()->getTickersAllCoins();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getKlineData($from = null, $to = null, $resolution = null): ?CoinKline
+    {
+        return $this->getExchangeRepository()->getKlineData($this->symbol, $from, $to, $resolution);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getKlineDataAllCoins($from = null, $to = null, $resolution = null): ?array
+    {
+        return $this->getExchangeRepository()->getKlineDataAllCoins($from, $to, $resolution);
     }
 }

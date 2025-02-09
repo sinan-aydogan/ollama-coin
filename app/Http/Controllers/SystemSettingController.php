@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Coin;
 use App\Models\Wallet;
+use App\Settings\AnalysisSettings;
 use App\Settings\GeneralSettings;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -15,8 +16,15 @@ use Spatie\LaravelSettings\Settings;
 
 class SystemSettingController extends Controller
 {
-    public function index(GeneralSettings $settings)
+    public function index()
     {
+        $generalSettings = new GeneralSettings()->toArray();
+        $analysisSettings = new AnalysisSettings()->toArray();
+
+        $settings = [
+            ...$generalSettings,
+            ...$analysisSettings
+        ];
 
         return Inertia::render('SystemSettings', [
             'settings' => $settings,
@@ -24,12 +32,19 @@ class SystemSettingController extends Controller
         ]);
     }
 
-    public function update(Request $request, GeneralSettings $settings)
+    public function update(Request $request)
     {
-        $settings->ai_base_url = $request->input('ai_base_url');
-        $settings->ai_model = $request->input('ai_model');
-        $settings->default_exchange_for_market_data = $request->input('default_exchange_for_market_data');
-        $settings->save();
+        $generalSettings = new GeneralSettings();
+
+        $generalSettings->ai_base_url = $request->input('ai_base_url');
+        $generalSettings->ai_model = $request->input('ai_model');
+        $generalSettings->default_exchange_for_market_data = $request->input('default_exchange_for_market_data');
+        $generalSettings->save();
+
+        $analysisSettings = new AnalysisSettings();
+        $analysisSettings->default_kline_data_resolution = $request->input('default_kline_data_resolution');
+        $analysisSettings->default_kline_data_time_range = $request->input('default_kline_data_time_range');
+        $analysisSettings->save();
 
         return redirect()->route('system-settings.index');
     }

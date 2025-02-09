@@ -4,10 +4,14 @@ namespace App\Repositories\Exchange;
 
 use App\Interfaces\ExchangeRepositoryInterface;
 use App\Models\Coin;
+use App\Models\CoinKline;
 use App\Models\Wallet;
+use App\Settings\AnalysisSettings;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
+use RuntimeException;
 
 class BtcTurkRepository implements ExchangeRepositoryInterface
 {
@@ -21,6 +25,7 @@ class BtcTurkRepository implements ExchangeRepositoryInterface
         /*Create client*/
         $clientOptions = [
             'base_uri' => 'https://api.btcturk.com/api/',
+            'timeout' => 120.0,
         ];
 
         /*Add headers if wallet is not null for authorized end points*/
@@ -143,5 +148,73 @@ class BtcTurkRepository implements ExchangeRepositoryInterface
         }
 
         return $tickers;
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws JsonException
+     */
+    public function getKlineData($symbol, $from=null, $to=null, $resolution = "15"): ?CoinKline
+    {
+        $coin = Coin::where('symbol', $symbol)->first();
+        $analysisSettings = new AnalysisSettings();
+
+        if (!$coin) {
+            return null;
+        }
+
+        if (!$from) {
+            $from = (int) Carbon::now()->subMinutes((int) $analysisSettings->default_kline_data_time_range)->timestamp;
+        }
+        if (!$to) {
+            $to = (int) Carbon::now()->timestamp;
+        }
+        if (!$resolution) {
+            $resolution = $analysisSettings->default_kline_data_resolution;
+        }
+
+        $endpoint = "https://graph-api.btcturk.com/v1/klines/history?symbol={$symbol}&from={$from}&to={$to}&resolution={$resolution}";
+        $response = $this->client->get($endpoint);
+
+        if ($response->getStatusCode() === 429) {
+            throw new RuntimeException('Too many requests to the exchange');
+        }
+
+        $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+
+        return $coin->klines()->create([
+            'open' => $data['o'],
+            'high' => $data['h'],
+            'low' => $data['l'],
+            'close' => $data['c'],
+            'volume' => $data['v'],
+            'time' => $data['t'],
+        ]);
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws JsonException
+     */
+    public function getKlineDataAllCoins($symbols=null, $from=null, $to=null, $resolution = "15"): array
+    {
+        if (!$symbols) {
+            $symbols = Coin::all()->pluck('symbol')->toArray();
+        }
+
+        $klines = [];
+
+        foreach ($symbols as $symbol) {
+            $kline = $this->getKlineData($symbol, $from, $to, $resolution);
+
+            if (!$kline) {
+                continue;
+            }
+
+            $klines[] = $kline;
+            sleep(1);
+        }
+
+        return $klines;
     }
 }
