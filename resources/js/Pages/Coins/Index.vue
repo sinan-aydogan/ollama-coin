@@ -4,7 +4,6 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import CoinTable from "@/Pages/Coins/CoinTable.vue";
 import {ref} from "vue";
 import {router} from "@inertiajs/vue3";
-import LoadingSpinner from "@/Components/LoadingSpinner.vue";
 
 defineProps({
     coins: Array,
@@ -36,7 +35,7 @@ const syncCoinPrices = async ()=>{
         if (response.data.length>0){
             alert('Fiyatlar güncellendi')
 
-            router.reload({
+            router.visit(route('coins.index'), {
                 preserveScroll: true,
                 only: ['coins']
             })
@@ -77,7 +76,7 @@ const syncCoinPrices = async ()=>{
                 <div class="overflow-hidden">
                     <!--Loading message-->
                     <div v-if="in_progress" class="mb-8 bg-blue-200 rounded-lg p-4">
-                        <span class="text-gray-600 animate-pulse text-blue-800 font-semibold">Veri güncellemesi yapılıyor, lütfen bekleyiniz...</span>
+                        <span class="animate-pulse text-blue-800 font-semibold">Veri güncellemesi yapılıyor, lütfen bekleyiniz...</span>
                     </div>
 
                     <!--Coin Table-->

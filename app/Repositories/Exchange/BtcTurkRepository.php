@@ -4,7 +4,6 @@ namespace App\Repositories\Exchange;
 
 use App\Interfaces\ExchangeRepositoryInterface;
 use App\Models\Coin;
-use App\Models\CoinTicker;
 use App\Models\Wallet;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -126,6 +125,7 @@ class BtcTurkRepository implements ExchangeRepositoryInterface
             'volume' => $data['volume'],
             'price_change' => $data['daily'],
             'price_change_percent' => $data['dailyPercent'],
+            'price_at' => \Carbon\Carbon::createFromTimestamp($data['timestamp']),
         ]);
     }
 

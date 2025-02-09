@@ -46,8 +46,20 @@ const formatDate = (date) => {
 
 const generatedCoinList = computed(() => {
     let coins = [];
+
+    if (!props.coins) {
+        return coins;
+    }
     props.coins.forEach(coin => {
         let existCoin = coins.find(c => c.base_symbol === coin.base_symbol);
+
+        if (coin.price === null) {
+            coins.push({
+                base_symbol: coin.base_symbol,
+            })
+
+            return;
+        }
 
         if(existCoin === undefined){
             let price = {
@@ -61,11 +73,11 @@ const generatedCoinList = computed(() => {
             coins.push({
                 base_symbol: coin.base_symbol,
                 price,
-                updated_at: formatDate(coin.updated_at),
+                updated_at: formatDate(coin.last_ticker.created_at),
             })
         }else{
             let c = coins.find(c => c.base_symbol === coin.base_symbol);
-            if (c && !c.price[coin.quote_symbol]) {
+            if (c && c.price && !c.price[coin.quote_symbol]) {
                 c.price[coin.quote_symbol] = {
                     price: cleanedPrice(coin.price),
                     price_change_percent: cleanedPrice(coin.last_ticker.price_change_percent),
@@ -129,24 +141,30 @@ const cleanedPrice = (price) => {
                 <div class="flex justify-between items-start">
                     <h2 class="text-xl font-semibold text-gray-800">{{ coin.base_symbol }}</h2>
                     <div class="flex flex-col text-right text-sm">
-                        <div v-for="(price,quote_symbol) in coin.price" :key="quote_symbol">
-                            <div v-if="filters.quoted_symbol === '' || filters.quoted_symbol === quote_symbol" class="flex flex-col items-center justify-end space-x-2 mb-2">
-                                <span class="text-gray-600">{{ price.price  + ' ' + quote_symbol }}</span>
+                        <template v-if="coin.price">
+                            <div v-for="(price,quote_symbol) in coin.price" :key="quote_symbol">
+                                <div v-if="filters.quoted_symbol === '' || filters.quoted_symbol === quote_symbol" class="flex flex-col items-center justify-end space-x-2 mb-2">
+                                    <span class="text-gray-600">{{ price.price  + ' ' + quote_symbol }}</span>
 
-                                <div
-                                    class="flex items-center justify-center space-x-1"
-                                    :class="{
-                                    'text-green-500': price.price_change_direction === 'up',
-                                    'text-red-500': price.price_change_direction === 'down',
-                                    'text-gray-600': price.price_change_direction === null,
-                                }"
-                                >
-                                    <span class="text-xs">{{ price.price_change_percent }}%</span>
-                                    <UpTrendIcon v-if="price.price_change_direction === 'up'" class="w-4 h-4"/>
-                                    <DownTrendIcon v-if="price.price_change_direction === 'down'" class="w-4 h-4"/>
+                                    <div
+                                        class="flex items-center justify-center space-x-1"
+                                        :class="{
+                                        'text-green-500': price.price_change_direction === 'up',
+                                        'text-red-500': price.price_change_direction === 'down',
+                                        'text-gray-600': price.price_change_direction === null,
+                                    }"
+                                    >
+                                        <span class="text-xs">{{ price.price_change_percent }}%</span>
+                                        <UpTrendIcon v-if="price.price_change_direction === 'up'" class="w-4 h-4"/>
+                                        <DownTrendIcon v-if="price.price_change_direction === 'down'" class="w-4 h-4"/>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </template>
+
+                        <template v-else>
+                            <span class="text-gray-600">Fiyatı Güncelleyin</span>
+                        </template>
                     </div>
                 </div>
 
@@ -174,7 +192,3 @@ const cleanedPrice = (price) => {
         </div>
     </div>
 </template>
-
-<style scoped>
-
-</style>
