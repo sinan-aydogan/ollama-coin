@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\CoinTickerUpdated;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -21,6 +22,19 @@ class CoinTicker extends Model
         'price_change',
         'price_change_percent',
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            event(new CoinTickerUpdated($model));
+        });
+
+        static::updated(function ($model) {
+            event(new CoinTickerUpdated($model));
+        });
+    }
 
     protected $casts = [
         'price_at' => 'datetime',

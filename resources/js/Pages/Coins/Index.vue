@@ -2,14 +2,15 @@
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import CoinTable from "@/Pages/Coins/CoinTable.vue";
-import {ref} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {router} from "@inertiajs/vue3";
 
-defineProps({
+const props = defineProps({
     coins: Array,
 })
 
 const in_progress = ref(false)
+const coinsList = ref([])
 
 const syncCoinList = async ()=>{
     in_progress.value = true
@@ -48,6 +49,25 @@ const syncCoinPrices = async ()=>{
         in_progress.value = false
     })
 }
+
+onMounted(()=>{
+    coinsList.value = props.coins
+
+    Echo.channel("coin-ticker-updates")
+        .listen(".ticker.updated", (event) => {
+            console.log("Güncellenen Coin Ticker:", event.ticker);
+
+            // Güncellenen fiyatı frontend üzerinde göster
+            const coin = coinsList.value.find(c => c.id === event.ticker.coin_id);
+            if (coin) {
+                coin.price = event.ticker.last;
+            }
+        });
+})
+
+watch(()=>props.coins, ()=>{
+    coinsList.value = props.coins
+})
 </script>
 
 <template>
@@ -80,7 +100,7 @@ const syncCoinPrices = async ()=>{
                     </div>
 
                     <!--Coin Table-->
-                    <CoinTable :coins/>
+                    <CoinTable :coins="coinsList"/>
                 </div>
             </div>
         </div>
