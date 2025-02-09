@@ -38,7 +38,7 @@ class Coin extends Model
 
     public function lastTicker(): HasOne
     {
-        return $this->hasOne(CoinTicker::class)->latest('price_at');
+        return $this->hasOne(CoinTicker::class)->latest('created_at');
     }
 
     public function klines(): HasMany
@@ -48,13 +48,13 @@ class Coin extends Model
 
     public function getPriceAttribute()
     {
-        $latestTicker = $this->tickers()->latest('price_at')->first();
+        $latestTicker = $this->tickers()->latest('created_at')->first();
         return $latestTicker ? $latestTicker->last : null;
     }
 
     public function getPriceChangeDirectionAttribute(): ?string
     {
-        $latestTicker = $this->tickers()->latest('price_at')->first();
+        $latestTicker = $this->tickers()->latest('created_at')->first();
         return $latestTicker ? $latestTicker->price_change > 0 ? 'up' : 'down' : null;
     }
 

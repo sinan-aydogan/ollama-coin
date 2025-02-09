@@ -130,7 +130,6 @@ class BtcTurkRepository implements ExchangeRepositoryInterface
             'volume' => $data['volume'],
             'price_change' => $data['daily'],
             'price_change_percent' => $data['dailyPercent'],
-            'price_at' => \Carbon\Carbon::createFromTimestamp($data['timestamp']),
         ]);
     }
 

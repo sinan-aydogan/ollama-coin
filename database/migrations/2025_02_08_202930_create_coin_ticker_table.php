@@ -24,7 +24,6 @@ return new class extends Migration
             $table->bigInteger('volume');
             $table->decimal('price_change', 16, 8);
             $table->decimal('price_change_percent', 16, 8);
-            $table->timestamp('price_at')->nullable();
             $table->timestamps();
         });
     }

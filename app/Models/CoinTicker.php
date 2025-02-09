@@ -18,7 +18,6 @@ class CoinTicker extends Model
         'bid',
         'ask',
         'volume',
-        'price_at',
         'price_change',
         'price_change_percent',
     ];
@@ -35,10 +34,6 @@ class CoinTicker extends Model
             event(new CoinTickerUpdated($model));
         });
     }
-
-    protected $casts = [
-        'price_at' => 'datetime',
-    ];
 
     public function coin(): BelongsTo
     {
