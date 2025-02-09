@@ -22,6 +22,7 @@
         "vue": "^3.3.13"
     },
     "dependencies": {
-        "@vueuse/core": "^12.5.0"
+        "@vueuse/core": "^12.5.0",
+        "vue-markdown-render": "^2.2.1"
     }
 }

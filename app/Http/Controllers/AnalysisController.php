@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Coin;
+use App\Services\AiService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,5 +46,12 @@ class AnalysisController extends Controller
         }
 
         return response()->json($klineData);
+    }
+
+    public function getTickerDataAiReport(Request $request): JsonResponse
+    {
+        $response = (new AiService())->predict(prompt: $request->input('prompt'), data: $request->input('data'), options: $request->input('options'));
+
+        return response()->json($response);
     }
 }
