@@ -93,8 +93,8 @@ class Coin extends Model
     /**
      * @throws Exception
      */
-    public function getKlineDataAllCoins($from = null, $to = null, $resolution = null): ?array
+    public function getKlineDataAllCoins($symbols=null,$from = null, $to = null, $resolution = null): ?array
     {
-        return $this->getExchangeRepository()->getKlineDataAllCoins($from, $to, $resolution);
+        return $this->getExchangeRepository()->getKlineDataAllCoins($symbols, $from, $to, $resolution);
     }
 }

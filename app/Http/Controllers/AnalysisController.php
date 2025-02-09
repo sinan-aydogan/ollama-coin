@@ -20,7 +20,7 @@ class AnalysisController extends Controller
     /**
      * @throws Exception
      */
-    public function getKlineData($symbol, $from=null, $to=null, $resolution=null): JsonResponse
+    public function getKlineData(Request $request, $symbol, $from=null, $to=null, $resolution=null): JsonResponse
     {
         $coin = Coin::where('symbol', $symbol)->first();
 
@@ -36,9 +36,13 @@ class AnalysisController extends Controller
     /**
      * @throws Exception
      */
-    public function getKlineDataAllCoins($from=null, $to=null, $resolution=null): JsonResponse
+    public function getKlineDataAllCoins(Request $request, $from=null, $to=null, $resolution=null): JsonResponse
     {
-        $klineData = (new Coin())->getKlineDataAllCoins($from, $to, $resolution);
+        if ($request->has('symbols')) {
+            $klineData = (new Coin())->getKlineDataAllCoins($request->input('symbols'), $from, $to, $resolution);
+        }else{
+            $klineData = (new Coin())->getKlineDataAllCoins($from, $to, $resolution);
+        }
 
         return response()->json($klineData);
     }

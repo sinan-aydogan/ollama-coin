@@ -39,6 +39,7 @@ Route::middleware([
     /*Analysis*/
     Route::get('/analysis', [AnalysisController::class, 'index'])->name('analysis.index');
     Route::get('/get-kline-data-all-coins', [AnalysisController::class, 'getKlineDataAllCoins'])->name('analysis.get-kline-data-all-coins');
+    Route::post('/get-kline-data-selected-coins', [AnalysisController::class, 'getKlineDataAllCoins'])->name('analysis.get-kline-data-selected-coins');
 
     /*Settings*/
     Route::get('/system-settings', [SystemSettingController::class, 'index'])->name('system-settings.index');

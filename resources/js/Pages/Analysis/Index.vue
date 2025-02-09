@@ -1,19 +1,23 @@
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import CoinTable from "@/Pages/Coins/CoinTable.vue";
+import CoinTable from "@/Pages/Analysis/CoinTable.vue";
 import {ref} from "vue";
 import {router} from "@inertiajs/vue3";
+import {useStorage} from "@vueuse/core";
 
 defineProps({
     coins: Array,
 })
 
 const in_progress = ref(false)
+const selected_symbols = useStorage('selectedSymbolsForAnalysis', []);
 
 const getKlineData = async ()=>{
     in_progress.value = true
-    await axios.get(route('analysis.get-kline-data-all-coins')).then(response=>{
+    await axios.post(route('analysis.get-kline-data-selected-coins'),{
+        symbols: selected_symbols.value
+    }).then(response=>{
         if (response.data.length>0){
             alert('Kline verisi alındı')
             router.reload({
